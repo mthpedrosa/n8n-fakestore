@@ -1,0 +1,220 @@
+{
+  "name": "Arquivos - Gipsyy",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Split\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "9266e62b-9744-4a0f-a127-00832556530e",
+      "name": "IF3",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        720,
+        480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "arquivo",
+        "options": {}
+      },
+      "id": "0a67cac2-d2a6-475f-96d7-46b016b8ba9e",
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        160,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "6283510b-09e5-46dd-bf34-93a89035a652",
+      "name": "Split",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        380,
+        480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "arquivo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c7d72f0a-d897-44a2-a565-09b4a24e3618",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        480
+      ],
+      "webhookId": "c58182d5-83d6-49f0-b9f0-0003350791ac"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json[\"body\"][\"entidade\"] }}",
+          "mode": "name"
+        },
+        "columnToMatchOn": "id",
+        "options": {}
+      },
+      "id": "453f6655-586a-4fe2-9815-c71faadf4b08",
+      "name": "MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        540,
+        480
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=Criação/edição em massa realizada com sucesso!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "18ab9248-7907-4d8f-b1f5-3d50b585180c",
+      "name": "PostSlack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        920,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<script>\nalert(\"Edicao em massa realizada com sucesso!\");\nwindow.parent.location = \"http://localhost/formularioteste.php\";\n</script>",
+        "options": {}
+      },
+      "id": "36840877-d75d-4fb3-956f-0384125b6ed4",
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        480
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "IF3": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PostSlack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spreadsheet File": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "IF3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostSlack": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "7be7d80b-2571-4aea-9036-a60c46058892",
+  "id": "23",
+  "meta": {
+    "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"
+  },
+  "tags": []
+}

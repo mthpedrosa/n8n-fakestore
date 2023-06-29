@@ -1,0 +1,314 @@
+{
+  "name": "Cron de produtos - Gipsyy",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "61130a8f-ae2d-49ae-93e5-27a9b7f9a396",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        280
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://fakestoreapi.com/products/",
+        "options": {}
+      },
+      "id": "a94eb564-4e45-4358-9bcf-13b7583d99e6",
+      "name": "GetProduto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        160,
+        280
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "1b1b4171-a1ba-43ce-af5e-69b7935057d7",
+      "name": "Split",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        380,
+        280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "var produto = $node.Split.json\n\nconst listaTrocas = {\n  \"title\": \"nome\",\n  \"price\": \"preco\",\n  \"description\":\"descricao\",\n  \"category\":\"categoria\",\n  \"image\":\"imagem\"\n};\n\nfunction trocarNomes(objeto, listaTrocas) {\n  for (var propriedade in objeto) {\n    if (objeto.hasOwnProperty(propriedade)) {\n      for (var nomeAntigo in listaTrocas) {\n        if (nomeAntigo === propriedade) {\n          objeto[listaTrocas[nomeAntigo]] = objeto[propriedade];\n          delete objeto[propriedade];\n        }\n      }\n    }\n  }\n}\n\nproduto.avaliacao =  !!produto.rating.rate ? produto.rating.rate : 0 ;\ndelete produto.rating\n\ntrocarNomes(produto,listaTrocas);\n\nproduto.categoria = $node.MySQL2.json.id\n\n\nreturn produto;\n"
+      },
+      "id": "7461625c-d5bd-467b-9381-91fb0c15f60f",
+      "name": "Map",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        740,
+        280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Split\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "12e07430-8a2c-428b-b36b-39adfb2faec4",
+      "name": "IF3",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1080,
+        280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": {
+          "__rl": true,
+          "value": "produtos",
+          "mode": "list",
+          "cachedResultName": "produtos"
+        },
+        "columnToMatchOn": "id",
+        "options": {}
+      },
+      "id": "71c38694-9289-464a-9c3f-bc63750a1c06",
+      "name": "MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        920,
+        280
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=Cron de produtos realizada com sucesso, ao todo {{ $json.count }} produtos foram criados/atualizados"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "89bbe444-763a-4c97-8cbe-6ebbb8515a7a",
+      "name": "PostSlack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1460,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [],\n  i = 0;\n\ndo {\n  try {\n    results = results.concat($(\"Map\").all(0, i));\n  } catch (error) {\n    return {\"count\":i,\"logs\":results};\n  }\n  i++;\n} while (true);\n"
+      },
+      "id": "5e7c769a-8f18-40ed-ba86-7a765b97f207",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1280,
+        280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "228197fb-cc92-4b72-9da4-bb5347c1f4e9",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "categorias",
+          "mode": "list",
+          "cachedResultName": "categorias"
+        },
+        "returnAll": true,
+        "where": {
+          "values": [
+            {
+              "column": "nome",
+              "value": "={{ $json.category }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "05a06655-634b-40b7-a0d4-b9e4338ae51e",
+      "name": "MySQL2",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        280
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      },
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GetProduto": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "MySQL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "IF3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF3": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "PostSlack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "GetProduto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL2": {
+      "main": [
+        [
+          {
+            "node": "Map",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "GetProduto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "9041e9ce-4b22-4930-a905-f46fd429da0e",
+  "id": "19",
+  "meta": {
+    "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"
+  },
+  "tags": []
+}

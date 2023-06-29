@@ -1,0 +1,507 @@
+{
+  "name": "CRUD - Gipsyy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "556ade6a-708b-4e3b-8d4e-8546fd3fc085",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "11df858f-79e0-4951-83af-20237745a83a",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        720
+      ],
+      "webhookId": "556ade6a-708b-4e3b-8d4e-8546fd3fc085",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{$json.frase}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4ecbf830-c933-4b56-a954-0a2487f780ea",
+      "name": "PostSlack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        560,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "={{ $json.query.entidade }}",
+          "mode": "name"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "id": "41f9afc6-9c63-4c46-ab47-1ae939a706ad",
+      "name": "MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        -140
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "a6d78656-7e60-476c-a071-2dd93d54430d",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "path": "consultas",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0d743e4d-d03e-44af-afc7-e1a9266445d7",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -140
+      ],
+      "webhookId": "5545bb7f-ea90-45c8-b6d6-99bccdfa6f72"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{$json.results}}",
+        "options": {}
+      },
+      "id": "3538ecaf-bf5d-48f6-82d0-f77471101c7b",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [],\n  i = 0;\n\ndo {\n  try {\n    results = results.concat($(\"MySQL\").all(0, i));\n  } catch (error) {\n    return {results};\n  }\n  i++;\n} while (true);\n"
+      },
+      "id": "1c4695f1-98f2-4f85-95f8-dfb72526f546",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        20,
+        -140
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Consultas\n",
+        "height": 198.56287425149716,
+        "width": 706.88622754491
+      },
+      "id": "b57d86da-abee-4a91-a0b4-0cb469b41406",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Webhook2').item.json[\"query\"][\"entidade\"] }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "8129b576-4dca-4229-81bf-ab23fbdc4bcc",
+      "name": "MySQL1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        20,
+        100
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criar",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "fe587447-e2ef-4676-aab3-2d564b4a8e21",
+      "name": "Webhook2",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        100
+      ],
+      "webhookId": "5545bb7f-ea90-45c8-b6d6-99bccdfa6f72"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<script>\nalert(\"Criado com sucesso!\");\nwindow.parent.location = \"http://localhost/formularioteste.php\";\n</script>",
+        "options": {}
+      },
+      "id": "ff7e8144-ef5d-47dd-991b-d9f3bcec9e2b",
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Criação\n",
+        "height": 198.56287425149716,
+        "width": 1070.086881551629
+      },
+      "id": "f856db35-0ede-4a89-b75e-18377b5d10ac",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return $node.Webhook2.json.body\n"
+      },
+      "id": "e6ad1e02-9e5a-49ea-b826-ea13d4adc2a1",
+      "name": "Map1",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        -160,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "var frase = \"\";\nvar nome = $node.Webhook2.json.body.nome\n\nif($node.Webhook2.query.entidade == \"categorias\"){\n  frase = \"Categoria \"+nome+\" criada com sucesso\"\n}else if($node.Webhook2.query.entidade == \"produtos\"){\n  frase = \"Produto \"+nome;\n}\nreturn {frase}\n"
+      },
+      "id": "d3defba5-119a-49d9-bac9-9706547eb88d",
+      "name": "MapMensagem",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        380,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{$json.frase}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe827309-2ca2-4c35-8195-96b48ca5202f",
+      "name": "PostSlack1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        380,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Webhook3').item.json[\"query\"][\"entidade\"] }}",
+          "mode": "name"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $('Webhook3').item.json[\"query\"][\"id\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "93ce5977-59b3-4aff-80d8-63f570ac48bb",
+      "name": "MySQL2",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        340
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "deletar",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "9ff4056a-2145-4a6e-b222-a4ed8af6fa58",
+      "name": "Webhook3",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        340
+      ],
+      "webhookId": "5545bb7f-ea90-45c8-b6d6-99bccdfa6f72"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<script>\nalert(\"Excluido com sucesso!\");\nwindow.parent.location = \"http://localhost/formularioteste.php\";\n</script>",
+        "options": {}
+      },
+      "id": "d3c09cdd-ba9d-4341-8b96-743dca2374e6",
+      "name": "Respond to Webhook2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        20,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Deletar",
+        "height": 198.5628742514972,
+        "width": 885.423213898302
+      },
+      "id": "48411c7a-44e4-403b-a086-185fad0c532f",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "var frase = \"\";\nvar nome = $node.Webhook3.json.query.id\n\nif($node.Webhook3.query.entidade == \"categorias\"){\n  frase = \"Categoria \"+nome+\" deletada com sucesso\"\n}else if($node.Webhook3.query.entidade == \"produtos\"){\n  frase = \"Produto \"+nome+\" deletado com sucesso\";\n}\nreturn {frase}\n"
+      },
+      "id": "4f44154a-7a44-4d32-8414-4fbb1f0a6544",
+      "name": "MapMensagem1",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        200,
+        340
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Map1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map1": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "MapMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MapMensagem": {
+      "main": [
+        [
+          {
+            "node": "PostSlack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook3": {
+      "main": [
+        [
+          {
+            "node": "MySQL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook2": {
+      "main": [
+        [
+          {
+            "node": "MapMensagem1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MapMensagem1": {
+      "main": [
+        [
+          {
+            "node": "PostSlack1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "bcede376-11d7-4583-9536-d6822a6d69e9",
+  "id": "17",
+  "meta": {
+    "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"
+  },
+  "tags": [
+    {
+      "createdAt": "2023-06-06T18:39:09.089Z",
+      "updatedAt": "2023-06-06T18:39:09.089Z",
+      "id": "2",
+      "name": "TESTE"
+    }
+  ]
+}

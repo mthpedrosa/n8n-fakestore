@@ -1,0 +1,266 @@
+{
+  "name": "Cron de categorias - Gipsyy",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "let results = [],\n  i = 0;\n\ndo {\n  try {\n    results = results.concat($(\"GetCategorias\").all(0, i));\n  } catch (error) {\n    return {results}\n  }\n  i++;\n} while (true);\n"
+      },
+      "id": "cf09274a-2afe-4fd8-991d-44e4f90fbdab",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        560,
+        220
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "var categorias = []\n  var opcoes = $node.Code1.json.results\nvar i = 1;\n\nfor (op of opcoes){\n  categorias.push({\"id\":i,\"nome\":op.json});\n  i++\n}\n\nreturn categorias"
+      },
+      "id": "ebc61366-39b4-477c-b1b9-27440cdd6b04",
+      "name": "Map1",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        760,
+        220
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "bd61226b-2fc4-4eca-b3ab-06eaf7cd4bf3",
+      "name": "Split1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        980,
+        220
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": {
+          "__rl": true,
+          "value": "categorias",
+          "mode": "list",
+          "cachedResultName": "categorias"
+        },
+        "columnToMatchOn": "id",
+        "options": {}
+      },
+      "id": "92b23a58-0127-4b66-87cc-76c58f0736ee",
+      "name": "MySQL1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        1160,
+        220
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$node[\"Split1\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "d2e63e00-e51f-466a-ace8-ee8cee7ad33f",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1340,
+        220
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "f35083e9-2c1f-49a1-8f94-68e5b48217a0",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        180,
+        220
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=Cron de categorias realizada com sucesso!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96620554-445a-47a9-acdf-e738a31dbdf9",
+      "name": "PostSlack1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1540,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://fakestoreapi.com/products/categories",
+        "options": {}
+      },
+      "id": "a550d42d-b5d1-4416-afc0-ca40fdc477e5",
+      "name": "GetCategorias",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        360,
+        220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "c3a2fc43-e1fd-4186-86e3-520f62305202",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        60
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Map1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map1": {
+      "main": [
+        [
+          {
+            "node": "Split1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split1": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Split1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PostSlack1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "GetCategorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetCategorias": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "GetCategorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "583e0034-9dff-460f-ad07-e2d8b09596cb",
+  "id": "20",
+  "meta": {
+    "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"
+  },
+  "tags": []
+}

@@ -1,0 +1,295 @@
+{
+  "name": "Relatorios - Gipsyy",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "relatorios",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "60955b84-dfda-4045-a9b8-1530b7750103",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -80
+      ],
+      "webhookId": "c58182d5-83d6-49f0-b9f0-0003350791ac"
+    },
+    {
+      "parameters": {
+        "fromEmail": "pedrosa.mth@gmail.com",
+        "toEmail": "mth.pedrosa@outlook.com",
+        "subject": "Relatorio Produtos/Categorias",
+        "text": "Segue em anexo relatório gerado.",
+        "options": {}
+      },
+      "id": "884faeae-7908-42d1-ad05-b7985d1470b1",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        440,
+        -140
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "13",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "produtos",
+          "mode": "name"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "categoria",
+              "value": "={{ $json.query.categoria }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bde53639-eb09-4760-a8ce-020fe676d480",
+      "name": "MySQL",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.1,
+      "position": [
+        -340,
+        -80
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "10",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "binaryPropertyName": "RelatorioCategorias",
+        "options": {}
+      },
+      "id": "71a71bb3-14be-4e67-8bcb-a6b4afddf5f8",
+      "name": "Spreadsheet File1",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//Verifica lugares para enviar o relatorio \nvar envios = {}\nvar opcoes =  $node.Webhook.json.query.opcoes\n\nif (opcoes.includes(\"email\")) {\n  envios.email = 1\n} else {\n  envios.email = 0\n}\n\nreturn envios;"
+      },
+      "id": "fe729ccc-427d-4648-b64f-fb076faffb6a",
+      "name": "Map1",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        20,
+        -80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.email }}",
+              "operation": "larger"
+            }
+          ]
+        }
+      },
+      "id": "671d8c62-9a03-4a36-beda-1918c3275503",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://hooks.slack.com/services/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",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=Relatorio de produtos vinculados a categoria {{ $('Webhook').item.json.query.categoria }} criado com sucesso!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c92fce44-c3c6-4a36-b52b-0d050d4c7041",
+      "name": "PostSlack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        620,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<script>\nalert(\"Criado com sucesso!\");\nwindow.parent.location = \"http://localhost/formularioteste.php\";\n</script>",
+        "options": {}
+      },
+      "id": "1576e5a7-9533-484f-9252-dbd498c6b555",
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        780,
+        -100
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "localhost:5678",
+            "connection": "keep-alive",
+            "sec-ch-ua": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "sec-fetch-site": "same-site",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "sec-fetch-dest": "document",
+            "referer": "http://localhost/",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "cookie": "rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX1%2Bz7ZkRwvINz7qaafmEemvJG%2Bj1%2B34O7eg%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX19XANMtLwT%2FTeMt5apx%2F2O%2BX%2Fndb7sLUEQ%3D; n8n-auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNhNGY3ODBmLTE4ZWQtNDY0OS04N2M0LTZmZjc4YmI2Y2E5MyIsImVtYWlsIjpudWxsLCJwYXNzd29yZCI6bnVsbCwiaWF0IjoxNjg3OTYyMTIxLCJleHAiOjE2ODg1NjY5MjF9.-jscAKjsTyOj9OgIj0Fwc-belabM-imOPOqhfmq55qo; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX19hxTpWbIn9q012p8CDuggr0bcjZEcSU2cieoBBR7I3L3OyuMIU6GMpPgIUPgB439q7GYzNjony9A%3D%3D; rl_group_id=RudderEncrypt%3AU2FsdGVkX19mCfrRUDBV7OoRUXhvki4CkzhopGn92ME%3D; rl_group_trait=RudderEncrypt%3AU2FsdGVkX1%2B8RqhYkM%2BO7JI%2BtZe7wxHpy5I1%2FmScmjY%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX18vkisExicJSacOh1fqnCMfvp7oyBBEaZP2rtnTX9fqP6hobwq9dwg8LYQIvHNW7f4yeo5NYQofhEeJu3LLZ6NE5a%2FMVKoS64sO1pbakMYMfSsioVUawimaC1MqcL7MYZ9O%2BYjUBMsrWcNn9CviIkiY0lD0cV6Mjk4%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX1%2FRmUfisHQ8%2Fw7Q1EmCf1SeBQDZiVQTNpK0L4YsKxu57%2BHpr598ZfSTw96RZ1uUud%2B5AMsH0PRg8uLDZ1IWKEO8HGLDvkpqjl4elvbECG7n7lVaAInPL7KAR8nzZjCh42KzyTYsOBA6r77Mo%2F9CT24%2FwnPszLprey4%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22%24active_feature_flags%22%3A%5B%22schema-view%22%5D%2C%22%24enabled_feature_flags%22%3A%7B%22004_checklist%22%3Afalse%2C%22002_remove_templates%22%3Afalse%2C%22003_auto_insert_action%22%3Afalse%2C%22schema-view%22%3Atrue%7D%2C%22%24feature_flag_payloads%22%3A%7B%7D%2C%22distinct_id%22%3A%223359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0%23ca4f780f-18ed-4649-87c4-6ff78bb6ca93%22%2C%22%24device_id%22%3A%2218877b8b9dcea0-05554e5fcd2729-26031a51-15f900-18877b8b9dd1987%22%2C%22%24user_state%22%3A%22identified%22%2C%22%24user_id%22%3A%223359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0%23ca4f780f-18ed-4649-87c4-6ff78bb6ca93%22%2C%22%24sesid%22%3A%5B1688061561757%2C%22189082c368a139-056f5aac4cb346-26031d51-144000-189082c368b23dc%22%2C1688059262602%5D%2C%22%24session_recording_enabled_server_side%22%3Atrue%2C%22%24console_log_recording_enabled_server_side%22%3Afalse%2C%22%24session_recording_recorder_version_server_side%22%3A%22v2%22%2C%22%24autocapture_disabled_server_side%22%3Afalse%2C%22%24stored_person_properties%22%3A%7B%22companyType%22%3A%22personal%22%2C%22reportedSource%22%3A%22linkedin%22%2C%22version%22%3A%22v4%22%2C%22personalization_survey_submitted_at%22%3A%222023-06-01T16%3A10%3A14.561Z%22%2C%22personalization_survey_n8n_version%22%3A%220.228.2%22%2C%22instance_id%22%3A%223359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0%22%2C%22created_at_timestamp%22%3A1685635764661%7D%7D; rl_session=RudderEncrypt%3AU2FsdGVkX18u7jel09JXvGTc1zScDjxSjjNbTpEXUQssJRXizQgT9VPI8kbERX%2FQwtkh9ZBOtAoxgwmHvuXr6vH2XcRRR1MowdobcEnnPG7JQy8MeGQsV%2FP%2BmRNQ4zIws9499F7RHQtSNsqMmvhdbw%3D%3D"
+          },
+          "params": {},
+          "query": {
+            "categoria": "1",
+            "opcoes": [
+              "email"
+            ]
+          },
+          "body": {}
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spreadsheet File1": {
+      "main": [
+        [
+          {
+            "node": "Map1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map1": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PostSlack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "PostSlack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostSlack": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "988d69d7-7afe-4736-bbcb-c2ce57b8e01e",
+  "id": "22",
+  "meta": {
+    "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"
+  },
+  "tags": []
+}
