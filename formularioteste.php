@@ -28,18 +28,18 @@
         <label for="nome">Descrição:</label>
         <input type="text" class="form-control" id="descricao" name="descricao" required>
         <label for="nome">Preço:</label>
-        <input type="int" class="form-control" id="preco" name="preco" required>
+        <input type="number" class="form-control" id="preco" name="preco" required>
         <label for="nome">Categoria:</label>
         <input type="int" class="form-control" id="categoria" name="categoria" required>
         <label for="nome">Imagem (URL):</label>
         <input type="text" class="form-control" id="imagem" name="imagem" required>
         <label for="nome">Avaliacao:</label>
-        <input type="int" class="form-control" id="aaliacao" name="avaliacao" required>
+        <input type="number" class="form-control" id="avaliacao" name="avaliacao" required>
       </div>
       <button type="submit" class="btn btn-primary">Criar</button>
     </form>
 
-
+    <br><br>
 
     <!-- Tabela de registros -->
     <h3>Produtos</h3>
@@ -71,7 +71,8 @@
             echo "<td>".$registro['json']['descricao']."</td>";
             echo "<td>".$registro['json']['preco']."</td>";
             echo "<td>".$registro['json']['categoria']."</td>";
-            echo "<td>".$registro['json']['imagem']."</td>";
+            //echo "<td>".$registro['json']['imagem']."</td>";
+            echo "<td><img src='".$registro['json']['imagem']."' class='img-thumbnail rounded-circle' alt='Ícone' width='50' height='50'></td>";
             echo "<td>".$registro['json']['avaliacao']."</td>";
             echo "<td><a href='http://localhost:5678/webhook/deletar?entidade=produtos&id=".$registro['json']['id']."' class='btn btn-danger'>Excluir</a></td>";
             echo "</tr>";
@@ -90,6 +91,7 @@
         <tr>
           <th>ID</th>
           <th>Nome</th>
+          <th>Qtd produtos nessa categoria</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -104,6 +106,7 @@
             echo "<tr>";
             echo "<td>".$registro['json']['id']."</td>";
             echo "<td>".$registro['json']['nome']."</td>";
+            echo "<td>".$registro['json']['total_produtos']."</td>";
             echo "<td><a href='http://localhost:5678/webhook/deletar?entidade=categorias&id=".$registro['json']['id']."' class='btn btn-danger'>Excluir</a></td>";
             echo "</tr>";
           }
@@ -114,10 +117,21 @@
     <br><br>
 
     <!-- Relatorios -->
-    <h3>Gerar Relatorios</h3>
+    <h3>Gerar Relatorios - Produtos</h3>
 
-    <form method="GET" action="http://localhost:5678/webhook-test/relatorios">
+    <form method="GET" action="http://localhost:5678/webhook/relatorios">
       <div class="form-group">
+
+        <label for="nome">Filtro:</label>
+        <select id="filtro" name="filtro">
+            <option value="categoria">Categorias</option>
+            <option value="avaliacao">Avalição</option>
+        </select>
+        <br>
+
+        <label for="nome">Avalição:</label>
+        <input type="number" class="form-control" id="avaliacao" name="avaliacao" required>
+
         
         <label for="nome">Categoria:</label>
         <?php
@@ -143,13 +157,28 @@
       <button type="submit" class="btn btn-primary">Gerar</button>
     </form>
 
+    <br><br>
+    <h3>Gerar Relatorios - Categorias</h3>
+
+    <form method="GET" action="http://localhost:5678/webhook/relatorios-categorias">
+      <div class="form-group">
+        <br>
+        <label for="nome">Enviar para:</label>
+        <br>
+        <input type="checkbox" id="opcao1" name="opcoes[]" value="email">
+        <label for="opcao1">E-mail</label><br>
+        
+      </div>
+      <button type="submit" class="btn btn-primary">Gerar</button>
+    </form>
+
 
 
     <br><br>
 
     <!-- Edição/Criacao em massa por Planilha -->
     <h3>Criação/Edição em massa por planilha</h3>
-    <form method="POST" action="http://localhost:5678/webhook-test/arquivo" enctype="multipart/form-data">
+    <form method="POST" action="http://localhost:5678/webhook/arquivo" enctype="multipart/form-data">
       <div class="form-group">
         
         <label for="nome">Entidade:</label>

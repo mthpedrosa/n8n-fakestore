@@ -15,8 +15,8 @@
       "name": "IF3",
       "type": "n8n-nodes-base.if",
       "position": [
-        720,
-        480
+        520,
+        580
       ],
       "typeVersion": 1
     },
@@ -30,8 +30,8 @@
       "type": "n8n-nodes-base.spreadsheetFile",
       "typeVersion": 1,
       "position": [
-        160,
-        480
+        -40,
+        580
       ]
     },
     {
@@ -45,8 +45,8 @@
       "name": "Split",
       "type": "n8n-nodes-base.splitInBatches",
       "position": [
-        380,
-        480
+        180,
+        580
       ],
       "typeVersion": 1
     },
@@ -62,8 +62,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
-        -40,
-        480
+        -240,
+        580
       ],
       "webhookId": "c58182d5-83d6-49f0-b9f0-0003350791ac"
     },
@@ -83,8 +83,8 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.1,
       "position": [
-        540,
-        480
+        340,
+        580
       ],
       "credentials": {
         "mySql": {
@@ -96,7 +96,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hooks.slack.com/services/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",
+        "url": "=https://hooks.slack.com/services/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",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -113,8 +113,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        920,
-        480
+        720,
+        580
       ]
     },
     {
@@ -128,9 +128,85 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        1080,
-        480
+        880,
+        580
       ]
+    },
+    {
+      "parameters": {
+        "content": "const itensnovos    = {};\nconst newItems      = [];\nvar     error       = '';\nvar position = 0;\n\ntry{\n    const comissionada  = $node.VendaComi.json.data;\n    if (isEmpty(comissionada[0])){}else{\n        for(const itens of comissionada){\n            \n            //verifica campos obrigatorios\n            if(isNullOrEmpty(itens.Quantidade)){\n                error = error+\"| O campo 'Quantidade' do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n            }\n            if(itens[\"Moeda de Entrada\"] == null || itens[\"Moeda de Entrada\"] == \"\"){\n                error = error+\"| O campo 'Moeda de Entrada' do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n            }\n            //moeda saida - vai quebrar por causa do ascento\n            if(itens[\"Moeda de Saída\"] == null || itens[\"Moeda de Saída\"] == \"\"){\n                error = error+\"| O campo 'Moeda de Saída' do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n            }\n\n            //Verificando porque não esat vindo\n            /*\n            if(itens[\"Custo do fornecedor\"] == null || itens[\"Custo do fornecedor\"] == \"\"){\n                error = error+\"| O campo 'Custo do fornecedor' do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n            }\n            if(itens[\"Estado de origem\"] == null || itens[\"Estado de origem\"] == \"\"){\n                error = error+\"| O campo 'Estado de origem' do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n            }\n\n            if(itens[\"Entrar com Markup ou Valor de Venda ?\"] == \"Valor de Venda\"){\n                if(itens[\"Valor de Venda\"] == null || itens[\"Valor de Venda\"] == \"\"){\n                    error = error+\"| O campo \"+itens[\"Entrar com Markup ou Valor de Venda ?\"] +\" do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n                }else{\n                    itens.Tipo = 1\n                    itens.Position = position;\n                    itens.Opcao = 504428;\n                    position++\n                    newItems.push({json: itens});\n                }\n                \n            }*/\n            if(isNullOrEmpty(itens[\"Valor unitário de Venda\"])){\n                    error = error+\"| O campo \"+itens[\"Valor unitário de venda\"] +\" do produto \"+itens.Produto+\" na aba 'Venda Comissionada' não esta preenchido \"\n            }else{\n                itens.Tipo = 1\n                itens.Position = position;\n                itens.Opcao = 504428;\n                position++\n                newItems.push({json: itens});\n            }\n            \n        }\n    }\n}catch{}\n\n\n/*{\n  \"Código\": \"\",\n  \"Produto\": \"JL660A465\",\n  *\"Moeda de Entrada\": \"UU$\",\n  *\"Custo do fornecedor\": 100,\n  *\"Quantidade\": 2,\n  \"Entrar com Markup ou Valor de Venda ?\": \"Valor de Venda\",\n  \"Estado de origem\": \"SC\",\n  \"Valor de Venda\": 2000\n},*/\n\n\n\ntry{\n    const revenda       = $node.Revenda.json.data\n    if (isEmpty(revenda[0])){}else{\n        for(const itens of revenda){\n            if(itens.hasOwnProperty(\"Produto\")){\n                //verifica campos obrigatorios\n                if(isNullOrEmpty(itens.Quantidade)){\n                    error = error+\"| O campo 'Quantidade' do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido \"\n                }\n                //ICMS - campo novo\n                if(isNullOrEmpty(itens.ICMS)){\n                    error = error+\"| O campo 'ICMS' do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido \"\n                }\n                if(itens[\"Moeda de Entrada\"] == null || itens[\"Moeda de Entrada\"] == \"\"){\n                    error = error+\"| O campo 'Moeda de Entrada' do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido \"\n                }\n                //moeda saida - vai quebrar por causa do ascento\n                if(itens[\"Moeda de Saída\"] == null || itens[\"Moeda de Saída\"] == \"\"){\n                    error = error+\"| O campo 'Moeda de Saída' do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido \"\n                }\n                if(isNullOrEmpty(itens[\"Custo do fornecedor\"])){\n                    error = error+\"| O campo 'Custo do fornecedor' do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido \"\n                }\n                if(itens[\"Estado de origem\"] == null || itens[\"Estado de origem\"] == \"\"){\n                    error = error+\"| O campo 'Estado de origem' do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido \"\n                }\n\n\n\n                if(itens[\"Entrar com Margem ou Preço de Venda ?\"] == \"Margem\"){\n                    if(itens.Margem == null || itens.Margem == \"\"){\n                        error = error+\"| O campo \"+itens[\"Entrar com Margem ou Preço de Venda ?\"] +\" do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido\"\n                    }else{\n                        itens.Tipo = 2\n                        itens.Position = position;\n                        itens.Opcao = 39149\n                        position++\n                        newItems.push({json: itens});\n                    }\n\n                }else if(itens[\"Entrar com Margem ou Preço de Venda ?\"] == \"Preço de Venda\"){\n                    if(itens[\"Pre\\u00E7o de venda unit\\u00E1rio (Entrada) \\t\"] == null || itens[\"Pre\\u00E7o de venda unit\\u00E1rio (Entrada) \\t\"]  == \"\"){\n                        error = error+\", O campo \"+itens[\"Entrar com Margem ou Preço de Venda ?\"] +\" do produto \"+itens.Produto+\" na aba 'Revenda' não esta preenchido\"\n                    }else{\n                        itens.Tipo = 2\n                        itens.Position = position;\n                        itens.Opcao = 39148\n                        position++\n                        newItems.push({json: itens});\n                    }\n                }\n            }\n        }\n    }\n}catch{}\n/*{\n  \"Produto\": \"JL660A\",\n  \"Moeda de Entrada\": \"UU$\",\n  \"Custo do fornecedor\": 100,\n  \"Quantidade\": 2,\n  \"Entrar com Margem ou Preço de Venda ?\": \"Margem\",\n  \"Estado de origem\": \"SC\",\n  \"Margem\": 30,\n  \"Preço de venda unitário (Entrada) \": \"\"\n},*/\n\n\nconsole.log(error)\nif(error != ''){\n    return {\"error\":error}\n}else{\n    itensnovos.itens = newItems;\n    return {newItems};\n}\n\n\n\n \n /*for (const item of $node.ConsultaBanco.json.value) {\n \n    newItems.push({json: item});\n\n}*/\n\n\nfunction isEmpty(obj) {\n    for(var prop in obj) {\n        if(obj.hasOwnProperty(prop))\n            return false;\n    }\n\n    return true;\n}\n\nfunction isNullOrEmpty(value) {\n  return value === null || value === undefined || value === '';\n}",
+        "width": 238.89870836165875
+      },
+      "id": "ec37c79d-3c4e-43c5-afb7-545807f2fcb8",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const itensnovos    = {};\nconst newItems      = [];\nvar     error       = '';\nvar position = 0;\n\ntry{\n    const lista  = $node.List.json.data;\n        for(const itens of lista){\n            if(isNullOrEmpty(itens.nome)){\n                error = error+\"| O campo 'Nome' do produto \"+itens.id+\" não esta preenchido \"\n            }\n            newItems.push(itens);\n        }\n}catch{}\nconsole.log(error)\nif(error != ''){\n    return {\"error\":error}\n}else{\n    itensnovos.itens = newItems;\n    return {newItems};\n}\n\n\nfunction isEmpty(obj) {\n    for(var prop in obj) {\n        if(obj.hasOwnProperty(prop))\n            return false;\n    }\n\n    return true;\n}\n\nfunction isNullOrEmpty(value) {\n  return value === null || value === undefined || value === '';\n}"
+      },
+      "id": "8ee6d935-e96e-4c30-84eb-1fffb60b5cba",
+      "name": "Mapeamento",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        440,
+        340
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "aggregateItems",
+        "aggregate": "aggregateAllItemData"
+      },
+      "id": "22fa0106-f661-488d-84c5-7e85b116df6a",
+      "name": "List",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json[\"error\"] }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "a84ae346-492a-4fc7-8eb5-2bfbd24f93f4",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        620,
+        340
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<script>\nalert(\"{{$json.error}}\");\nwindow.parent.location = \"http://localhost/formularioteste.php\";\n</script>",
+        "options": {}
+      },
+      "id": "011c1065-fe83-497d-acc1-912ab6d3d254",
+      "name": "RespondErrorAlert",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        820,
+        260
+      ],
+      "typeVersion": 1
     }
   ],
   "pinData": {},
@@ -207,11 +283,48 @@
           }
         ]
       ]
+    },
+    "List": {
+      "main": [
+        [
+          {
+            "node": "Mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mapeamento": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "RespondErrorAlert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
-  "settings": {},
-  "versionId": "7be7d80b-2571-4aea-9036-a60c46058892",
+  "active": true,
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "24"
+  },
+  "versionId": "07f880e0-fcab-4bc4-8662-3a17e66e05a8",
   "id": "23",
   "meta": {
     "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"

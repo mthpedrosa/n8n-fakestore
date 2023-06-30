@@ -4,7 +4,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hooks.slack.com/services/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",
+        "url": "=https://hooks.slack.com/services/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",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -53,7 +53,7 @@
   },
   "active": false,
   "settings": {},
-  "versionId": "0441447d-17b1-4b8a-997f-6a74f9792789",
+  "versionId": "54ada750-0a07-4816-af38-7bcd769d2feb",
   "id": "24",
   "meta": {
     "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"

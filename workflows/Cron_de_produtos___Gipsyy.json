@@ -16,8 +16,7 @@
       "position": [
         -80,
         280
-      ],
-      "disabled": true
+      ]
     },
     {
       "parameters": {
@@ -112,7 +111,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hooks.slack.com/services/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",
+        "url": "=https://hooks.slack.com/services/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",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -290,22 +289,11 @@
           }
         ]
       ]
-    },
-    "When clicking \"Execute Workflow\"": {
-      "main": [
-        [
-          {
-            "node": "GetProduto",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": false,
   "settings": {},
-  "versionId": "9041e9ce-4b22-4930-a905-f46fd429da0e",
+  "versionId": "2bfe75a3-0d8e-47d4-a04f-e650a3aa7cad",
   "id": "19",
   "meta": {
     "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"

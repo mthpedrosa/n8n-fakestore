@@ -104,13 +104,12 @@
       "position": [
         180,
         220
-      ],
-      "disabled": true
+      ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hooks.slack.com/services/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",
+        "url": "=https://hooks.slack.com/services/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",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -255,9 +254,13 @@
       ]
     }
   },
-  "active": false,
-  "settings": {},
-  "versionId": "583e0034-9dff-460f-ad07-e2d8b09596cb",
+  "active": true,
+  "settings": {
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "24"
+  },
+  "versionId": "4b02185b-adcc-40fe-b7f9-9ccba0d65d55",
   "id": "20",
   "meta": {
     "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"

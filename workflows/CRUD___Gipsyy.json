@@ -22,7 +22,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hooks.slack.com/services/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",
+        "url": "=https://hooks.slack.com/services/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",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -45,13 +45,8 @@
     },
     {
       "parameters": {
-        "operation": "select",
-        "table": {
-          "__rl": true,
-          "value": "={{ $json.query.entidade }}",
-          "mode": "name"
-        },
-        "returnAll": true,
+        "operation": "executeQuery",
+        "query": "={{ $json.sql }}",
         "options": {}
       },
       "id": "41f9afc6-9c63-4c46-ab47-1ae939a706ad",
@@ -59,7 +54,7 @@
       "type": "n8n-nodes-base.mySql",
       "typeVersion": 2.1,
       "position": [
-        -160,
+        -140,
         -140
       ],
       "credentials": {
@@ -225,7 +220,7 @@
     },
     {
       "parameters": {
-        "functionCode": "var frase = \"\";\nvar nome = $node.Webhook2.json.body.nome\n\nif($node.Webhook2.query.entidade == \"categorias\"){\n  frase = \"Categoria \"+nome+\" criada com sucesso\"\n}else if($node.Webhook2.query.entidade == \"produtos\"){\n  frase = \"Produto \"+nome;\n}\nreturn {frase}\n"
+        "functionCode": "var frase = \"\";\nvar nome = $node.Webhook2.json.body.nome\n\nif($node.Webhook2.json.query.entidade == \"categorias\"){\n  frase = \"Categoria \"+nome+\" criada com sucesso\"\n}else if($node.Webhook2.json.query.entidade == \"produtos\"){\n  frase = \"Produto \"+nome;\n}\nreturn {frase}\n"
       },
       "id": "d3defba5-119a-49d9-bac9-9706547eb88d",
       "name": "MapMensagem",
@@ -239,7 +234,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://hooks.slack.com/services/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",
+        "url": "=https://hooks.slack.com/services/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",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -342,7 +337,7 @@
     },
     {
       "parameters": {
-        "functionCode": "var frase = \"\";\nvar nome = $node.Webhook3.json.query.id\n\nif($node.Webhook3.query.entidade == \"categorias\"){\n  frase = \"Categoria \"+nome+\" deletada com sucesso\"\n}else if($node.Webhook3.query.entidade == \"produtos\"){\n  frase = \"Produto \"+nome+\" deletado com sucesso\";\n}\nreturn {frase}\n"
+        "functionCode": "var frase = \"\";\nvar nome = $node.Webhook3.json.query.id\n\nif($node.Webhook3.json.query.entidade == \"categorias\"){\n  frase = \"Categoria \"+nome+\" deletada com sucesso\"\n}else if($node.Webhook3.json.query.entidade == \"produtos\"){\n  frase = \"Produto \"+nome+\" deletado com sucesso\";\n}\nreturn {frase}\n"
       },
       "id": "4f44154a-7a44-4d32-8414-4fbb1f0a6544",
       "name": "MapMensagem1",
@@ -350,6 +345,19 @@
       "position": [
         200,
         340
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "var entidade =  $node.Webhook1.json.query.entidade\nvar sql = \"\"\n\nif(entidade == \"categorias\"){\n  sql = \"SELECT c.id, c.nome, COUNT(p.id) AS total_produtos FROM categorias c INNER JOIN produtos p ON c.id =p.categoria GROUP BY c.id, c.nome;\"\n}else if(entidade == \"produtos\"){\n  sql = \"SELECT * FROM produtos;\"\n}\n\nreturn {sql}"
+      },
+      "id": "95a98514-51a9-4a43-affd-f6c98ae7bfb3",
+      "name": "SetQuery",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        -240,
+        -360
       ],
       "typeVersion": 1
     }
@@ -360,7 +368,7 @@
       "main": [
         [
           {
-            "node": "MySQL",
+            "node": "SetQuery",
             "type": "main",
             "index": 0
           }
@@ -487,11 +495,26 @@
           }
         ]
       ]
+    },
+    "SetQuery": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
-  "settings": {},
-  "versionId": "bcede376-11d7-4583-9536-d6822a6d69e9",
+  "settings": {
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "24"
+  },
+  "versionId": "29259b99-1236-4f4c-abf0-23b0c511feb8",
   "id": "17",
   "meta": {
     "instanceId": "3359013736477c9d377ce906eaf4d600bbe2d640c6610fa1a1ef5878167b94f0"
